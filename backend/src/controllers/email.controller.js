@@ -1,4 +1,6 @@
 const emailQueue = require("../../queues/email.queue");
+const eventBus = require("../../utils/eventBus");
+const EVENTS = require("../../utils/events");
 const { addJob, getJobs } = require("../../utils/jobStore");
 
 const sendEmail = async (req, res)=>{
@@ -21,8 +23,13 @@ const sendEmail = async (req, res)=>{
                 type: "exponential",
                 delay: 2000
             }
-        }
+        },
     );
+
+    eventBus.emit(EVENTS.EMAIL_QUEUED, {
+            jobId: job.id,
+            email
+    });
 
     // store job
     addJob({

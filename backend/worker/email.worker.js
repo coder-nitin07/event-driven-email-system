@@ -1,5 +1,7 @@
 const { Worker } = require('bullmq');
 const { updateJob } = require('../utils/jobStore');
+const eventBus = require('../utils/eventBus');
+const EVENTS = require('../utils/events');
 
 // create worker
 const emailWorker = new Worker(
@@ -24,7 +26,12 @@ const emailWorker = new Worker(
             host: '127.0.0.1',
             port: 6379
         }
-    }
+    },
+
+    eventBus.emit(EVENTS.EMAIL_PROCESSING, {
+        jobId: job.id,
+        email: job.data.email
+    })
 );
 
 // listen to events
