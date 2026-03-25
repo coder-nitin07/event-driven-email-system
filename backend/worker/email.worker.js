@@ -1,4 +1,5 @@
 const { Worker } = require('bullmq');
+const { updateJob } = require('../utils/jobStore');
 
 // create worker
 const emailWorker = new Worker(
@@ -8,6 +9,9 @@ const emailWorker = new Worker(
         try {
             console.log(`Processing Job: `, job.id);
             console.log(`Email:  `, job.data.email);
+            
+            // update status
+            updateJob(job.id, { status: 'processing' });
 
             // email sending delay
             await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -29,9 +33,11 @@ const emailWorker = new Worker(
 
 // listen to events
 emailWorker.on('completed', (job) =>{
+    updateJob(job.id, { status: 'completed' });
     console.log(`Job ${ job.id } completed`);
 });
 
 emailWorker.on('failed', (job, err)=>{
+    updateJob(job.id, { status: 'failed' });
     console.log(`Job ${ job.id } failed: ${ err.message }`);
 });
