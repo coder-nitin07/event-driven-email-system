@@ -46,7 +46,8 @@ const sendEmail = async (req, res)=>{
 
 // get api
 const getAllJobs = (req, res)=>{
-    return res.json(getJobs());
+    const jobs = getJobs();
+    return res.status(200).json(jobs);
 };
 
 module.exports = { sendEmail, getAllJobs };
