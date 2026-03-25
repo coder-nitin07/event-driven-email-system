@@ -6,21 +6,17 @@ const emailWorker = new Worker(
     'email-queue',
 
     async (job) =>{
-        try {
-            console.log(`Processing Job: `, job.id);
-            console.log(`Email:  `, job.data.email);
-            
-            // update status
-            updateJob(job.id, { status: 'processing' });
+        console.log(`Processing Job: `, job.id);
+        console.log(`Email:  `, job.data.email);
 
-            // email sending delay
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-
-            console.log("Email sent to: ", job.data.email);
-        } catch (err) {
-            console.log("Job failed: ", err.message);
-            throw err;
+        if (Math.random() < 0.5) {
+            console.log('Simulated failure');
+            throw new Error('Email sending failed');
         }
+
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
+        console.log("Email sent to: ", job.data.email);
     },
 
     {
@@ -38,6 +34,14 @@ emailWorker.on('completed', (job) =>{
 });
 
 emailWorker.on('failed', (job, err)=>{
-    updateJob(job.id, { status: 'failed' });
-    console.log(`Job ${ job.id } failed: ${ err.message }`);
+    console.log(`Job ${job.id} failed (${job.attemptsMade} attempts)`);
+
+    if (job.attemptsMade === job.opts.attempts) {
+        updateJob(job.id, { status: 'failed' });
+    }
+});
+
+emailWorker.on('active', (job) => {
+  updateJob(job.id, { status: 'processing' });
+  console.log(`🔄 Job ${job.id} | Attempt ${job.attemptsMade + 1}/${job.opts.attempts}`);
 });

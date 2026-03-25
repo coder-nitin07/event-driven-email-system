@@ -11,9 +11,18 @@ const sendEmail = async (req, res)=>{
     }
 
     // add job to the queue
-    const job = await emailQueue.add('send-email-job', {
-        email
-    });
+    const job = await emailQueue.add('send-email-job', 
+        {
+            email,
+        },
+        {
+            attempts: 3,
+            backoff: {
+                type: "exponential",
+                delay: 2000
+            }
+        }
+    );
 
     // store job
     addJob({
