@@ -5,6 +5,10 @@ const app = express();
 // middleware
 app.use(express.json());
 
+// cors
+const cors = require('cors');
+app.use(cors());
+
 // routes
 app.use('/api', emailRouter);
 

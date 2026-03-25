@@ -45,9 +45,27 @@ const sendEmail = async (req, res)=>{
 };
 
 // get api
-const getAllJobs = (req, res)=>{
-    const jobs = getJobs();
-    return res.status(200).json(jobs);
+const getAllJobs = async (req, res) => {
+    const jobs = await emailQueue.getJobs([
+        'waiting',
+        'active',
+        'completed',
+        'failed'
+    ]);
+
+    const formatted = jobs.map(job => ({
+        id: job.id,
+        email: job.data.email,
+        status: job.finishedOn
+            ? 'completed'
+            : job.failedReason
+            ? 'failed'
+            : job.processedOn
+            ? 'processing'
+            : 'queued'
+    }));
+
+    return res.json(formatted);
 };
 
 module.exports = { sendEmail, getAllJobs };

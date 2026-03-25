@@ -1,11 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>Email Queue System</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    
+
+  <div class="container">
+    <h1>Email Queue System</h1>
+
+    <!-- Input -->
+    <input type="email" id="emailInput" placeholder="Enter email" />
+    <button onclick="sendEmail()">Send Email</button>
+
+    <!-- Refresh -->
+    <button onclick="loadJobs()">Refresh Jobs</button>
+
+    <!-- Job List -->
+    <h2>Job List</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Job ID</th>
+          <th>Email</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="jobTable"></tbody>
+    </table>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

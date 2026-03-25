@@ -11,6 +11,11 @@ const emailWorker = new Worker(
         console.log(`Processing Job: `, job.id);
         console.log(`Email:  `, job.data.email);
 
+        eventBus.emit(EVENTS.EMAIL_PROCESSING, {
+            jobId: job.id,
+            email: job.data.email
+        })
+
         if (Math.random() < 0.5) {
             console.log('Simulated failure');
             throw new Error('Email sending failed');
@@ -19,6 +24,12 @@ const emailWorker = new Worker(
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
         console.log("Email sent to: ", job.data.email);
+
+        // ✅ emit success event
+        eventBus.emit(EVENTS.EMAIL_SENT, {
+            jobId: job.id,
+            email: job.data.email
+        });
     },
 
     {
@@ -27,11 +38,6 @@ const emailWorker = new Worker(
             port: 6379
         }
     },
-
-    eventBus.emit(EVENTS.EMAIL_PROCESSING, {
-        jobId: job.id,
-        email: job.data.email
-    })
 );
 
 // listen to events
