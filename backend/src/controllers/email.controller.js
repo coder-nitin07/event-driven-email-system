@@ -1,5 +1,6 @@
+const emailQueue = require("../../queues/email.queue");
 
-const sendEmail = (req, res)=>{
+const sendEmail = async (req, res)=>{
     const { email } = req.body;
 
     if(!email || !email.includes('@')){
@@ -8,8 +9,13 @@ const sendEmail = (req, res)=>{
         });
     }
 
+    // add job to the queue
+    await emailQueue.add('send-email-job', {
+        email
+    });
+
     return res.status(200).json({
-        message: 'Email request received'
+        message: 'Email job added to Queue'
     });
 };
 
